@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vibraops-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vibraops-api
+  template:
+    metadata:
+      labels:
+        app: vibraops-api
+    spec:
+      containers:
+        - name: api
+          image: vibraops/api:latest
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/vibraops
+            - name: SPRING_DATASOURCE_USERNAME
+              value: vibraops
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: vibraops
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vibraops-api
+spec:
+  selector:
+    app: vibraops-api
+  ports:
+    - port: 8080
+      targetPort: 8080

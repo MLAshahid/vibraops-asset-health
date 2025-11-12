@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: vibraops
+      POSTGRES_USER: vibraops
+      POSTGRES_PASSWORD: vibraops
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/vibraops
+      SPRING_DATASOURCE_USERNAME: vibraops
+      SPRING_DATASOURCE_PASSWORD: vibraops
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  web:
+    build:
+      context: ../web
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://api:8080
+      NEXT_PUBLIC_WS_URL: ws://api:8080/ws
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  pg:
